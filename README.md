@@ -1,30 +1,21 @@
-# React + TypeScript + Vite
+# KANBAN TASK MANAGMENT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Description
+This is a task management application built using React. It allows users to create, edit, and delete tasks, organize them by status, and move them between different columns using drag and drop functionality.
 
-Currently, two official plugins are available:
+## Technologies Used
+- React: A JavaScript library for building user interfaces.
+- Material-UI: A popular React UI framework that provides pre-designed components and styles for building modern web applications.
+- react-beautiful-dnd: A library for creating smooth and efficient drag and drop experiences in React applications.
+- TypeScript: A typed superset of JavaScript that adds static type-checking capabilities.
+- Axios: A promise-based HTTP client for making AJAX requests.
+- ESLint: A tool for identifying and reporting on patterns found in ECMAScript/JavaScript code.
+- Prettier: An opinionated code formatter.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Features
+- Create tasks and organize them by status (e.g., To Do, In Progress, Done).
+- Edit task details such as title and description.
+- Delete tasks.
+- View detailed information about a task.
+- Add new tasks to any column using a convenient modal interface.
+- Edit and manage boards
