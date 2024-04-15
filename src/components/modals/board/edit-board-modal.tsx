@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Paper,
@@ -7,52 +7,49 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
-import { IBoard } from "@/types/";
 import { Close } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import { useUpdateBoard } from "@/hooks/board/useUpdateBoard";
+import { useBoard } from "@/hooks/board/useBoard";
+import { useBoardContext } from "@/providers/board-provider";
+import { useModalContext } from "@/providers/modal-provider";
 
-interface EditBoardModalProps {
-  open: boolean;
-  title: string;
-  currentBoard?: IBoard | null;
-  onSubmit: (body: { name: string }) => Promise<void>;
-  onCloseModal: () => void;
-}
+export const EditBoardModal = () => {
+  const { isEditBoardModalOpen, handleCloseEditBoardModalOpen } =
+    useModalContext();
+  const { boardId } = useBoardContext();
+  const { data: board } = useBoard(boardId);
 
-export const BoardModal: React.FC<EditBoardModalProps> = ({
-  open,
-  title,
-  currentBoard,
-  onSubmit,
-  onCloseModal,
-}) => {
-  const [newName, setNewName] = useState<string>("");
-
-  useEffect(() => {
-    if (currentBoard) {
-      setNewName(currentBoard.name);
-    }
-  }, [currentBoard]);
+  const [newName, setNewName] = useState<string>(board?.name || "");
+  const { mutate: editBoard } = useUpdateBoard();
 
   // Function to handle changes in the title input field
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewName(event.target.value);
   };
 
-  // Function to save the edited task
-  const handleSaveTask = () => {
+  // Function to create/update task
+  const handleSubmit = () => {
     if (!newName.trim()) {
       toast.error("Please provide name.");
       return;
     }
-    onSubmit({
-      name: newName,
-    });
-    onCloseModal();
+    if (board?._id) {
+      editBoard({ boardId: board._id, name: newName });
+      handleCloseEditBoardModalOpen();
+    } else {
+      console.error("Board ID is undefined.");
+    }
   };
 
+  useEffect(() => {
+    if (board) {
+      setNewName(board.name);
+    }
+  }, [board]);
+
   return (
-    <Modal open={open} onClose={onCloseModal}>
+    <Modal open={isEditBoardModalOpen} onClose={handleCloseEditBoardModalOpen}>
       <Paper
         sx={{
           position: "absolute",
@@ -67,10 +64,10 @@ export const BoardModal: React.FC<EditBoardModalProps> = ({
         }}
       >
         <Typography variant="h6" textAlign="center" mb={2} fontWeight="bold">
-          {title}
+          Edit Board
         </Typography>
         <IconButton
-          onClick={onCloseModal}
+          onClick={handleCloseEditBoardModalOpen}
           size="small"
           sx={{ position: "absolute", top: "10px", right: "10px" }}
         >
@@ -87,7 +84,7 @@ export const BoardModal: React.FC<EditBoardModalProps> = ({
         />
         <Button
           variant="contained"
-          onClick={handleSaveTask}
+          onClick={handleSubmit}
           size="large"
           sx={{ width: "100%" }}
         >

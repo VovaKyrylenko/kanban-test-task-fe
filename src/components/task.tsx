@@ -1,39 +1,33 @@
-import React from "react";
 import { Card, Typography, IconButton, Stack } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { ITask } from "@/types/";
 import { Draggable, DraggableProvided } from "react-beautiful-dnd";
+import { useDeleteTask } from "@/hooks/task/useDeleteTask";
+import { useModalContext } from "../providers/modal-provider";
 
 interface TaskProps {
   task: ITask;
-  index: number;
-  handleDeleteTask: (taskId: string) => void;
-  handleOpenEditModal: (task: ITask) => void;
-  handleOpenDetailsTaskModal: (taskId: string) => void;
 }
 
-export const Task: React.FC<TaskProps> = ({
-  task,
-  index,
-  handleDeleteTask,
-  handleOpenEditModal,
-  handleOpenDetailsTaskModal,
-}) => {
+export const Task: React.FC<TaskProps> = ({ task }) => {
+  const { handleOpenEditTaskModal, handleOpenDetailsTaskModal } =
+    useModalContext();
+  const { mutate: deleteTask } = useDeleteTask();
+
   const onEditClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.stopPropagation();
-    handleOpenEditModal(task);
+    handleOpenEditTaskModal(task._id);
   };
   const onDeleteClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.stopPropagation();
-    handleDeleteTask(task._id);
+    deleteTask(task._id);
   };
-
   return (
-    <Draggable draggableId={task._id} index={index}>
+    <Draggable draggableId={task._id} index={task.position}>
       {(provided: DraggableProvided) => (
         <Card
           key={task._id}

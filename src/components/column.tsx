@@ -1,27 +1,27 @@
-import React from "react";
-import { Button, Paper, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { Task } from "./task";
 import { Droppable } from "react-beautiful-dnd";
 import AddIcon from "@mui/icons-material/Add";
-import { ITask, TaskStatus } from "@/types";
+import { IColumn, ITask } from "@/types";
+import { useTasks } from "@/hooks/task/useTasks";
+import { useModalContext } from "../providers/modal-provider";
 
 interface ColumnProps {
-  title: TaskStatus;
-  tasks: ITask[];
-  handleDeleteTask: (taskToDeleteId: string) => void;
-  handleOpenAddTaskModal: (status: TaskStatus) => void;
-  handleOpenEditTaskModal: (task: ITask) => void;
-  handleOpenDetailsTaskModal: (taskId: string) => void;
+  column: IColumn;
 }
 
-export const Column: React.FC<ColumnProps> = ({
-  title,
-  tasks,
-  handleDeleteTask,
-  handleOpenAddTaskModal,
-  handleOpenEditTaskModal,
-  handleOpenDetailsTaskModal,
-}) => {
+export const Column: React.FC<ColumnProps> = ({ column }) => {
+  const { handleOpenCreateTaskModal } = useModalContext();
+  const { data: tasks, isLoading } = useTasks(column._id || "");
+  if (isLoading) {
+    return <CircularProgress />;
+  }
   return (
     <Paper
       sx={{
@@ -38,10 +38,10 @@ export const Column: React.FC<ColumnProps> = ({
         fontWeight={"700"}
         mb={"28px"}
       >
-        {title}
+        {column.name}
       </Typography>
       <Stack sx={{ height: "calc(60vh - 100px)", overflow: "auto" }}>
-        <Droppable droppableId={title}>
+        <Droppable droppableId={column._id}>
           {(provided) => (
             <div
               ref={provided.innerRef}
@@ -63,16 +63,7 @@ export const Column: React.FC<ColumnProps> = ({
                   Nothing here
                 </Typography>
               ) : (
-                tasks.map((task, index) => (
-                  <Task
-                    key={index}
-                    task={task}
-                    index={index}
-                    handleDeleteTask={handleDeleteTask}
-                    handleOpenEditModal={handleOpenEditTaskModal}
-                    handleOpenDetailsTaskModal={handleOpenDetailsTaskModal}
-                  />
-                ))
+                tasks.map((task: ITask) => <Task key={task._id} task={task} />)
               )}
               {provided.placeholder}
             </div>
@@ -83,7 +74,9 @@ export const Column: React.FC<ColumnProps> = ({
         variant="outlined"
         sx={{ p: "14px", width: "100%" }}
         startIcon={<AddIcon />}
-        onClick={() => handleOpenAddTaskModal(title)}
+        onClick={() => {
+          handleOpenCreateTaskModal(column._id);
+        }}
       >
         Add task
       </Button>

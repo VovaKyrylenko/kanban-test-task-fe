@@ -1,21 +1,28 @@
-import { IBoard } from "@/types";
-import { Delete, Edit } from "@mui/icons-material";
 import { Card, Typography, IconButton, Stack } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
 import CopyToClipboard from "react-copy-to-clipboard";
-import { toast } from "react-toastify";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { toast } from "react-toastify";
+import { useDeleteBoard } from "@/hooks/board/useDeleteBoard";
+import { useModalContext } from "../providers/modal-provider";
+import { useQueryClient } from "@tanstack/react-query";
+import { useBoard } from "@/hooks/board/useBoard";
+import { useBoardContext } from "../providers/board-provider";
 
-interface BoardCardInfoProps {
-  currentBoard: IBoard;
-  handleDeleteBoard: () => void;
-  handleOpenEditBoardModal: () => void;
-}
+export const BoardCardInfo = () => {
+  const queryClient = useQueryClient();
+  const { boardId, setBoardId } = useBoardContext();
+  const { handleOpenEditBoardModal } = useModalContext();
 
-export const BoardCardInfo: React.FC<BoardCardInfoProps> = ({
-  currentBoard,
-  handleDeleteBoard,
-  handleOpenEditBoardModal,
-}) => {
+  const { data: board } = useBoard(boardId);
+  const { mutate: deleteBoard } = useDeleteBoard();
+
+  const handleDeleteBoard = () => {
+    deleteBoard(boardId);
+    setBoardId("");
+    queryClient.invalidateQueries({ queryKey: ["board"] });
+  };
+
   return (
     <Card
       sx={{
@@ -36,13 +43,13 @@ export const BoardCardInfo: React.FC<BoardCardInfoProps> = ({
           maxWidth: "80%",
         }}
       >
-        {currentBoard.name}
+        {board?.name}
       </Typography>
 
       <Typography variant="body1" color="text.secondary" mb={1}>
-        Board ID: {currentBoard._id}{" "}
+        Board ID: {boardId}
         <CopyToClipboard
-          text={currentBoard._id}
+          text={boardId}
           onCopy={() => {
             toast.success("Succefully copied to clipboard");
           }}

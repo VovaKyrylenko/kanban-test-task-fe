@@ -1,4 +1,3 @@
-import { IBoard } from "@/types";
 import Search from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import {
@@ -8,27 +7,28 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
+import { useModalContext } from "../providers/modal-provider";
+import { useBoardContext } from "@/providers/board-provider";
 
 interface SearchBarProps {
-  currentBoard: IBoard | null;
   searchQuery: string;
   handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSearch: () => void;
-  handleOpenCreateBoardModal: () => void;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
-  currentBoard,
   searchQuery,
   handleSearchChange,
   handleSearch,
-  handleOpenCreateBoardModal,
 }) => {
+  const { boardId } = useBoardContext();
+
+  const { handleOpenCreateBoardModal } = useModalContext();
   return (
     <Stack
-      width={currentBoard ? "60%" : "100%"}
+      width={boardId ? "60%" : "100%"}
       justifyContent={"space-between"}
-      gap={currentBoard ? 0 : "10px"}
+      gap={boardId ? 0 : "10px"}
     >
       <TextField
         label="Search Boards"

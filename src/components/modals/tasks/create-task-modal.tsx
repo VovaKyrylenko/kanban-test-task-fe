@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Modal,
   Paper,
@@ -9,20 +9,22 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { Close } from "@mui/icons-material";
+import { useCreateTask } from "@/hooks/task/useCreateTask";
+import { useModalContext } from "@/providers/modal-provider";
+import { useTasks } from "@/hooks/task/useTasks";
 
-interface AddTaskModalProps {
-  open: boolean;
-  handleAddTask: (title: string, description: string) => void;
-  onCloseModal: () => void;
-}
-
-export const AddTaskModal: React.FC<AddTaskModalProps> = ({
-  open,
-  handleAddTask,
-  onCloseModal,
-}) => {
+export const AddTaskModal = () => {
   const [titleInput, setTitleInput] = useState<string>("");
   const [descriptionInput, setDescriptionInput] = useState<string>("");
+
+  const {
+    isCreateTaskModalOpen,
+    handleCloseCreateTaskModal,
+    columnIdToCreateTask,
+  } = useModalContext();
+
+  const { mutate: createTask } = useCreateTask();
+  const { data: columnTasks } = useTasks(columnIdToCreateTask ?? "");
 
   // Event handler for title input change
   const handleTitleInputChange = (
@@ -38,23 +40,29 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
     setDescriptionInput(event.target.value);
   };
 
-  // Event handler for add task button click
+  // Add task button click
   const onButtonClick = async () => {
     if (!titleInput.trim() || !descriptionInput.trim()) {
       toast.error("Please provide both title and description.");
       return;
     }
-    await handleAddTask(titleInput, descriptionInput);
-    onCloseModal();
+    if (!columnIdToCreateTask) {
+      toast.error("Please try again.");
+      return;
+    }
+    createTask({
+      columnId: columnIdToCreateTask,
+      body: {
+        title: titleInput,
+        description: descriptionInput,
+        position: columnTasks.length + 1,
+      },
+    });
+    handleCloseCreateTaskModal();
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onCloseModal}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
+    <Modal open={isCreateTaskModalOpen} onClose={handleCloseCreateTaskModal}>
       <Paper
         sx={{
           position: "absolute",
@@ -72,7 +80,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
           Add Task
         </Typography>
         <IconButton
-          onClick={onCloseModal}
+          onClick={handleCloseCreateTaskModal}
           size="small"
           sx={{ position: "absolute", top: "10px", right: "10px" }}
         >
