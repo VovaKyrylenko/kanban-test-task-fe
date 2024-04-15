@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateBoard } from "@/utils";
+import { updateBoard } from "@/api/board";
 
 export const useUpdateBoard = () => {
   const queryClient = useQueryClient();
